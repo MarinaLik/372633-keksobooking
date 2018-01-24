@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Marina Lik](https://up.htmlacademy.ru/javascript/12/user/372633).
-* Наставник: `Неизвестно`.
+* Наставник: `Евгений Лепёшкин`(https://htmlacademy.ru/profile/id144641).
 
 ---
 
