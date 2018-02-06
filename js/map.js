@@ -74,7 +74,7 @@ var nearestOffer = function (imgNum, caption, x, y, time) {
 var nearestOffers = [];
 var createOffers = function () {
   for (var i = 1; i <= COUNT; i++) {
-    var title = OFFER_TITLES[i];
+    var title = OFFER_TITLES[i - 1];
     var locationX = randomNumber(300, 900);
     var locationY = randomNumber(150, 500);
     var checkin = arrRandomElem(OFFER_CHECKS);
