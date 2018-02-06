@@ -10,7 +10,7 @@ var OFFER_TYPES = [
 var OFFER_CHECKS = ['12:00', '13:00', '14:00'];
 var OFFER_FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
 var PHOTOS = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
-  // размеры метки взяты из css .map__pin
+// размеры метки взяты из css .map__pin
 var PIN_WIDTH = 50;
 var PIN_HEIGHT = 70;
 
@@ -34,9 +34,16 @@ var checkOut = function (time) {
     return arrRandomElem(OFFER_CHECKS);
   }
 };
-  // перемешивание элементов в случайном порядке для сортировки фото в массиве
-var compareRandom = function (a, b) {
-  return Math.random();
+// перемешивание элементов в случайном порядке в массиве
+var mixArrRandom = function (arrName) {
+  var mixArr = arrName.slice();
+  for (var i = 0; i < mixArr.length - 1; i++) {
+    var randomIndex = randomNumber(0, mixArr.length - 2);
+    var changElem = mixArr[randomIndex];
+    mixArr[randomIndex] = mixArr[mixArr.length - 1];
+    mixArr[mixArr.length - 1] = changElem;
+  }
+  return mixArr;
 };
 
 var nearestOffer = function (imgNum, caption, x, y, time) {
@@ -55,7 +62,7 @@ var nearestOffer = function (imgNum, caption, x, y, time) {
       'checkout': checkOut(time),
       'features': randomFeatures(OFFER_FEATURES),
       'description': '',
-      'photos': PHOTOS.sort(compareRandom)
+      'photos': mixArrRandom(PHOTOS)
     },
     'location': {
       'x': x,
@@ -67,12 +74,11 @@ var nearestOffer = function (imgNum, caption, x, y, time) {
 var nearestOffers = [];
 var createOffers = function () {
   for (var i = 1; i <= COUNT; i++) {
-    var avatarNumber = i;
     var title = OFFER_TITLES[i];
     var locationX = randomNumber(300, 900);
     var locationY = randomNumber(150, 500);
     var checkin = arrRandomElem(OFFER_CHECKS);
-    nearestOffers.push(nearestOffer(avatarNumber, title, locationX, locationY, checkin));
+    nearestOffers.push(nearestOffer(i, title, locationX, locationY, checkin));
   }
 };
 createOffers();
@@ -102,7 +108,7 @@ var template = document.querySelector('template').content;
 var mapCard = template.querySelector('.map__card');
 var filtersContainer = document.querySelector('.map__filters-container');
 
-  // список услуг сгенерированного объявления для замены в шаблоне
+// список услуг сгенерированного объявления для замены в шаблоне
 var servicesList = function (data) {
   var services = document.createDocumentFragment();
   for (var j = 0; j < data.length; j++) {
@@ -112,7 +118,7 @@ var servicesList = function (data) {
   }
   return services;
 };
-  // список фотографий для замены в шаблоне
+// список фотографий для замены в шаблоне
 var imgList = function (data) {
   var images = document.createDocumentFragment();
   for (var j = 0; j < data.length; j++) {
@@ -122,12 +128,12 @@ var imgList = function (data) {
   }
   return images;
 };
-  // очищение списков в шаблоне
+// очищение списков в шаблоне
 var removeChildren = function (elem) {
   while (elem.lastChild) {
     elem.removeChild(elem.lastChild);
   }
-}
+};
 
 var renderCard = function (data) {
   var descriptionCard = mapCard.cloneNode(true);
@@ -148,6 +154,5 @@ var renderCard = function (data) {
   descriptionCard.querySelector('.popup__avatar').setAttribute('src', data.author.avatar);
   return descriptionCard;
 };
-console.log(renderCard(nearestOffers[0]));
 
-filtersContainer.insertAdjacentHTML('beforebegin', renderCard(nearestOffers[0]));
+map.insertBefore(renderCard(nearestOffers[0]), filtersContainer);
