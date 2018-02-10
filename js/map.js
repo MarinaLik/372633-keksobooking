@@ -13,6 +13,8 @@ var PHOTOS = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.g
 // размеры метки взяты из css .map__pin
 var PIN_WIDTH = 50;
 var PIN_HEIGHT = 70;
+var MAIN_PIN_WIDTH = 65;
+var MAIN_PIN_HEIGHT = 65;
 
 var randomNumber = function (min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -84,7 +86,6 @@ var createOffers = function () {
 createOffers();
 
 var map = document.querySelector('.map');
-map.classList.remove('map--faded');
 
 var renderPin = function (data) {
   var newPin = document.createElement('button');
@@ -102,7 +103,6 @@ var renderMap = function () {
   }
   return fragment;
 };
-mapPins.appendChild(renderMap());
 
 var template = document.querySelector('template').content;
 var mapCard = template.querySelector('.map__card');
@@ -154,5 +154,74 @@ var renderCard = function (data) {
   descriptionCard.querySelector('.popup__avatar').setAttribute('src', data.author.avatar);
   return descriptionCard;
 };
+// map.insertBefore(renderCard(nearestOffers[0]), filtersContainer);
 
-map.insertBefore(renderCard(nearestOffers[0]), filtersContainer);
+var mainPin = map.querySelector('.map__pin--main');
+var noticeForm = document.querySelector('.notice__form');
+var noticeFieldsets = noticeForm.querySelectorAll('fieldset');
+noticeFieldsets.forEach(function(item) {
+  item.setAttribute('disabled', '');
+});
+var inputAddress = noticeForm.querySelector('#address');
+
+var findAddress = function () {
+  var mainPinCoord = mainPin.getBoundingClientRect();
+  var addressCoordX = mainPinCoord.left + pageXOffset + MAIN_PIN_WIDTH / 2;
+  var addressCoordY = mainPinCoord.top + pageYOffset + MAIN_PIN_HEIGHT;
+  inputAddress.value = addressCoordX +', ' + addressCoordY;
+};
+findAddress();
+
+var activePage = function () {
+  if (map.classList.contains('map--faded')) {
+    map.classList.remove('map--faded');
+    mapPins.appendChild(renderMap());
+  }
+  if (noticeForm.classList.contains('notice__form--disabled')) {
+    noticeForm.classList.remove('notice__form--disabled');
+  }
+  noticeFieldsets.forEach(function(item) {
+    if (item.hasAttribute('disabled')) {
+      item.removeAttribute('disabled');
+    }
+  });
+};
+
+mainPin.addEventListener('mouseup', function() {
+  activePage();
+  findAddress();
+});
+
+// через сопоставление author.avatar
+
+// var targetCard = function (data) {
+//   for (var n = 0; n < nearestOffers.length; n++) {
+//     if (nearestOffers[n].author.avatar === data) {
+//       map.insertBefore(renderCard(nearestOffers[n]), filtersContainer);
+//     }
+//   }
+// };
+// targetCard('img/avatars/user01.png');
+
+// var onPinClick = function (evt) {
+//   var src = '';
+//   if (evt.target.classList.contains('map__pin') && evt.target != mainPin) {
+//     src = evt.target.firstChild.src;   // не определяет src
+//   }
+//   console.log(src);
+//   targetCard(src);
+// };
+
+// по индексу в массиве, т.к. метки добавляются по очереди, проходя по массиву nearestOffers
+//[index-1] т.к. в массив меток попадает mainPin
+
+var onPinClick = function (evt) {
+  var pinsOnMap = map.querySelectorAll('.map__pin');
+  var index = pinsOnMap.indexOf(evt.target, 1);  // не срабатывает indexOf, почему?
+  if (index > -1) {
+    map.insertBefore(renderCard(nearestOffers[index-1]), filtersContainer);
+  }
+  console.log(index);
+};
+
+mapPins.addEventListener('click', onPinClick);
