@@ -1,6 +1,8 @@
 'use strict';
 
 var COUNT = 8;
+var ESC_KEYCODE = 27;
+var ENTER_KEYCODE = 13;
 var OFFER_TITLES = ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец', 'Маленький ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик', 'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'];
 var OFFER_TYPES = [
   {'en': 'flat', 'ru': 'Квартира'},
@@ -48,6 +50,7 @@ var mixArrRandom = function (arrName) {
   return mixArr;
 };
 
+// создание объектов похожих объявлений
 var nearestOffer = function (imgNum, caption, x, y, time) {
   return {
     'author': {
@@ -85,6 +88,7 @@ var createOffers = function () {
 };
 createOffers();
 
+// создание меток (с обработчиком клика)
 var map = document.querySelector('.map');
 
 var renderPin = function (data) {
@@ -92,10 +96,12 @@ var renderPin = function (data) {
   newPin.className = 'map__pin';
   newPin.style = 'left: ' + (data.location.x + PIN_WIDTH / 2) + 'px; top: ' + (data.location.y + PIN_HEIGHT) + 'px';
   newPin.innerHTML = '<img src="' + data.author.avatar + '" width="40" height="40" draggable="false">';
+  newPin.addEventListener('click', function () {
+    renderCard(data);
+  });
   return newPin;
 };
 
-var mapPins = document.querySelector('.map__pins');
 var renderMap = function () {
   var fragment = document.createDocumentFragment();
   for (var p = 0; p < nearestOffers.length; p++) {
@@ -104,11 +110,11 @@ var renderMap = function () {
   return fragment;
 };
 
+// создание карточки объявления
 var template = document.querySelector('template').content;
 var mapCard = template.querySelector('.map__card');
 var filtersContainer = document.querySelector('.map__filters-container');
-
-// список услуг сгенерированного объявления для замены в шаблоне
+// список услуг сгенерированного объявления для замены в шаблоне карточки
 var servicesList = function (data) {
   var services = document.createDocumentFragment();
   for (var j = 0; j < data.length; j++) {
@@ -118,7 +124,7 @@ var servicesList = function (data) {
   }
   return services;
 };
-// список фотографий для замены в шаблоне
+// список фотографий для замены в шаблоне карточки
 var imgList = function (data) {
   var images = document.createDocumentFragment();
   for (var j = 0; j < data.length; j++) {
@@ -128,10 +134,28 @@ var imgList = function (data) {
   }
   return images;
 };
-// очищение списков в шаблоне
+// очищение скопированных списков в шаблоне
 var removeChildren = function (elem) {
   while (elem.lastChild) {
     elem.removeChild(elem.lastChild);
+  }
+};
+// закрытие карточки
+var closeCard = function () {
+  var popup = map.querySelector('.popup');
+  map.removeChild(popup);
+};
+var onPopupCloseClick = function () {
+  closeCard();
+};
+var onPopupClosePressEnt = function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE && evt.target === document.activeElement) {
+    closeCard();
+  }
+};
+var onPopupClosePressEsc = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    closeCard();
   }
 };
 
@@ -152,18 +176,27 @@ var renderCard = function (data) {
   removeChildren(picturesList);
   picturesList.appendChild(imgList(data.offer.photos));
   descriptionCard.querySelector('.popup__avatar').setAttribute('src', data.author.avatar);
-  return descriptionCard;
-};
-// map.insertBefore(renderCard(nearestOffers[0]), filtersContainer);
 
-var mainPin = map.querySelector('.map__pin--main');
+  var popupClose = descriptionCard.querySelector('.popup__close');
+  popupClose.addEventListener('click', onPopupCloseClick);
+  popupClose.addEventListener('keyup', onPopupClosePressEnt);
+  document.addEventListener('keyup', onPopupClosePressEsc);
+  if (map.querySelector('.popup')) {
+    closeCard();
+  }
+  map.insertBefore(descriptionCard, filtersContainer);
+};
+
+// активация страницы
+var mapPins = document.querySelector('.map__pins');
+var mainPin = mapPins.querySelector('.map__pin--main');
 var noticeForm = document.querySelector('.notice__form');
 var noticeFieldsets = noticeForm.querySelectorAll('fieldset');
 noticeFieldsets.forEach(function(item) {
   item.setAttribute('disabled', '');
 });
 var inputAddress = noticeForm.querySelector('#address');
-
+// определение адреса
 var findAddress = function () {
   var mainPinCoord = mainPin.getBoundingClientRect();
   var addressCoordX = mainPinCoord.left + pageXOffset + MAIN_PIN_WIDTH / 2;
@@ -180,7 +213,7 @@ var activePage = function () {
   if (noticeForm.classList.contains('notice__form--disabled')) {
     noticeForm.classList.remove('notice__form--disabled');
   }
-  noticeFieldsets.forEach(function(item) {
+  noticeFieldsets.forEach(function (item) {
     if (item.hasAttribute('disabled')) {
       item.removeAttribute('disabled');
     }
@@ -191,37 +224,3 @@ mainPin.addEventListener('mouseup', function() {
   activePage();
   findAddress();
 });
-
-// через сопоставление author.avatar
-
-// var targetCard = function (data) {
-//   for (var n = 0; n < nearestOffers.length; n++) {
-//     if (nearestOffers[n].author.avatar === data) {
-//       map.insertBefore(renderCard(nearestOffers[n]), filtersContainer);
-//     }
-//   }
-// };
-// targetCard('img/avatars/user01.png');
-
-// var onPinClick = function (evt) {
-//   var src = '';
-//   if (evt.target.classList.contains('map__pin') && evt.target != mainPin) {
-//     src = evt.target.firstChild.src;   // не определяет src
-//   }
-//   console.log(src);
-//   targetCard(src);
-// };
-
-// по индексу в массиве, т.к. метки добавляются по очереди, проходя по массиву nearestOffers
-//[index-1] т.к. в массив меток попадает mainPin
-
-var onPinClick = function (evt) {
-  var pinsOnMap = map.querySelectorAll('.map__pin');
-  var index = pinsOnMap.indexOf(evt.target, 1);  // не срабатывает indexOf, почему?
-  if (index > -1) {
-    map.insertBefore(renderCard(nearestOffers[index-1]), filtersContainer);
-  }
-  console.log(index);
-};
-
-mapPins.addEventListener('click', onPinClick);
