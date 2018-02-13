@@ -192,7 +192,7 @@ var mapPins = document.querySelector('.map__pins');
 var mainPin = mapPins.querySelector('.map__pin--main');
 var noticeForm = document.querySelector('.notice__form');
 var noticeFieldsets = noticeForm.querySelectorAll('fieldset');
-noticeFieldsets.forEach(function(item) {
+noticeFieldsets.forEach(function (item) {
   item.setAttribute('disabled', '');
 });
 var inputAddress = noticeForm.querySelector('#address');
@@ -201,7 +201,7 @@ var findAddress = function () {
   var mainPinCoord = mainPin.getBoundingClientRect();
   var addressCoordX = mainPinCoord.left + pageXOffset + MAIN_PIN_WIDTH / 2;
   var addressCoordY = mainPinCoord.top + pageYOffset + MAIN_PIN_HEIGHT;
-  inputAddress.value = addressCoordX +', ' + addressCoordY;
+  inputAddress.value = addressCoordX + ', ' + addressCoordY;
 };
 findAddress();
 
@@ -220,7 +220,7 @@ var activePage = function () {
   });
 };
 
-mainPin.addEventListener('mouseup', function() {
+mainPin.addEventListener('mouseup', function () {
   activePage();
   findAddress();
 });
