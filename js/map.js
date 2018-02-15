@@ -238,15 +238,15 @@ var minPrice = {
 //   price.min = minPrice[evt.target.value];
 // };
 // selectType.addEventListener('change', onSelectTypeChange);
-var onPriceMinChange = function (evt) {
+var onPriceMinChange = function () {
   price.min = minPrice[selectType.value];
 };
 price.addEventListener('input', onPriceMinChange);
-price.addEventListener('invalid', function (evt) {
+price.addEventListener('invalid', function () {
   if (price.validity.rangeOverflow) {
     price.setCustomValidity('Цена не должна превышать 1 000 000');
   } else if (price.validity.rangeUnderflow) {
-      price.setCustomValidity('Цена за аренду не должна быть меньше ' + minPrice[selectType.value]);
+    price.setCustomValidity('Цена за аренду не должна быть меньше ' + minPrice[selectType.value]);
   } else {
     price.setCustomValidity('');
   }
@@ -287,7 +287,7 @@ capacity.addEventListener('change', onCapacityChange);
 // красная рамка
 var onElemShowError = function (evt) {
   var elem = evt.target;
-  if(elem.validity.valid){
+  if (elem.validity.valid) {
     if (elem.classList.contains('error')) {
       elem.classList.remove('error');
     }
