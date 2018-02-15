@@ -224,3 +224,77 @@ mainPin.addEventListener('mouseup', function () {
   activePage();
   findAddress();
 });
+
+// валидация полей формы
+var selectType = noticeForm.querySelector('#type');
+var price = noticeForm.querySelector('#price');
+var minPrice = {
+  'bungalo': 0,
+  'flat': 1000,
+  'house': 5000,
+  'palace': 10000
+};
+// var onSelectTypeChange = function (evt) {
+//   price.min = minPrice[evt.target.value];
+// };
+// selectType.addEventListener('change', onSelectTypeChange);
+var onPriceMinChange = function (evt) {
+  price.min = minPrice[selectType.value];
+};
+price.addEventListener('input', onPriceMinChange);
+price.addEventListener('invalid', function (evt) {
+  if (price.validity.rangeOverflow) {
+    price.setCustomValidity('Цена не должна превышать 1 000 000');
+  } else if (price.validity.rangeUnderflow) {
+      price.setCustomValidity('Цена за аренду не должна быть меньше ' + minPrice[selectType.value]);
+  } else {
+    price.setCustomValidity('');
+  }
+});
+
+var selectTimein = noticeForm.querySelector('#timein');
+var selectTimeout = noticeForm.querySelector('#timeout');
+
+var onTimeinChange = function (evt) {
+  selectTimeout.value = evt.target.value;
+};
+var onTimeoutChange = function (evt) {
+  selectTimein.value = evt.target.value;
+};
+
+selectTimein.addEventListener('change', onTimeinChange);
+selectTimeout.addEventListener('change', onTimeoutChange);
+
+var room = noticeForm.querySelector('#room_number');
+var capacity = noticeForm.querySelector('#capacity');
+var capasityInRoom = {
+  '1': ['1'],
+  '2': ['1', '2'],
+  '3': ['1', '2', '3'],
+  '100': ['0']
+};
+
+var onCapacityChange = function () {
+  if (capasityInRoom[room.value].indexOf(capacity.value) === -1) {
+    capacity.setCustomValidity('Количество гостей не должно превышать количество комнат');
+  } else {
+    capacity.setCustomValidity('');
+  }
+};
+room.addEventListener('change', onCapacityChange);
+capacity.addEventListener('change', onCapacityChange);
+
+// красная рамка
+var onElemShowError = function (evt) {
+  var elem = evt.target;
+  if(elem.validity.valid){
+    if (elem.classList.contains('error')) {
+      elem.classList.remove('error');
+    }
+  } else {
+    if (!elem.classList.contains('error')) {
+      elem.classList.add('error');
+    }
+  }
+};
+noticeForm.addEventListener('input', onElemShowError);
