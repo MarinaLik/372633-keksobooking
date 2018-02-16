@@ -274,7 +274,19 @@ var capasityInRoom = {
   '100': ['0']
 };
 
+var capacityDisabled = function () {
+  var capacityOptions = capacity.querySelectorAll('option');
+  for (var i = 0; i < capacityOptions.length; i++) {
+    if (capacityOptions[i].hasAttribute('disabled')) {
+      capacityOptions[i].removeAttribute('disabled');
+    }
+    capacityOptions[i].disabled = (capasityInRoom[room.value].indexOf(capacityOptions[i].value) === -1) ? true : false;
+  } return capacityOptions;
+};
+capacityDisabled();
+
 var onCapacityChange = function () {
+  capacityDisabled();
   if (capasityInRoom[room.value].indexOf(capacity.value) === -1) {
     capacity.setCustomValidity('Количество гостей не должно превышать количество комнат');
   } else {
@@ -282,19 +294,19 @@ var onCapacityChange = function () {
   }
 };
 room.addEventListener('change', onCapacityChange);
-capacity.addEventListener('change', onCapacityChange);
+// capacity.addEventListener('input', onCapacityChange);
 
 // красная рамка
-var onElemShowError = function (evt) {
-  var elem = evt.target;
-  if (elem.validity.valid) {
-    if (elem.classList.contains('error')) {
-      elem.classList.remove('error');
-    }
-  } else {
-    if (!elem.classList.contains('error')) {
-      elem.classList.add('error');
-    }
-  }
-};
-noticeForm.addEventListener('input', onElemShowError);
+// var onElemShowError = function (evt) {
+//   var elem = evt.target;
+//   if (elem.validity.valid) {
+//     if (elem.classList.contains('error')) {
+//       elem.classList.remove('error');
+//     }
+//   } else {
+//     if (!elem.classList.contains('error')) {
+//       elem.classList.add('error');
+//     }
+//   }
+// };
+// noticeForm.addEventListener('input', onElemShowError, false);
