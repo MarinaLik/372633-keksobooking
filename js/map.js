@@ -199,8 +199,8 @@ var inputAddress = noticeForm.querySelector('#address');
 // определение адреса
 var findAddress = function () {
   var mainPinCoord = mainPin.getBoundingClientRect();
-  var addressCoordX = mainPinCoord.left + pageXOffset + MAIN_PIN_WIDTH / 2;
-  var addressCoordY = mainPinCoord.top + pageYOffset + MAIN_PIN_HEIGHT;
+  var addressCoordX = Math.floor(mainPinCoord.left + pageXOffset + MAIN_PIN_WIDTH / 2);
+  var addressCoordY = Math.floor(mainPinCoord.top + pageYOffset + MAIN_PIN_HEIGHT);
   inputAddress.value = addressCoordX + ', ' + addressCoordY;
 };
 findAddress();
@@ -234,13 +234,13 @@ var minPrice = {
   'house': 5000,
   'palace': 10000
 };
-// var onSelectTypeChange = function (evt) {
-//   price.min = minPrice[evt.target.value];
-// };
-// selectType.addEventListener('change', onSelectTypeChange);
+
 var onPriceMinChange = function () {
   price.min = minPrice[selectType.value];
+  price.setAttribute('placeholder', price.min);
 };
+
+selectType.addEventListener('change', onPriceMinChange);
 price.addEventListener('input', onPriceMinChange);
 price.addEventListener('invalid', function () {
   if (price.validity.rangeOverflow) {
@@ -294,19 +294,3 @@ var onCapacityChange = function () {
   }
 };
 room.addEventListener('change', onCapacityChange);
-// capacity.addEventListener('input', onCapacityChange);
-
-// красная рамка
-// var onElemShowError = function (evt) {
-//   var elem = evt.target;
-//   if (elem.validity.valid) {
-//     if (elem.classList.contains('error')) {
-//       elem.classList.remove('error');
-//     }
-//   } else {
-//     if (!elem.classList.contains('error')) {
-//       elem.classList.add('error');
-//     }
-//   }
-// };
-// noticeForm.addEventListener('input', onElemShowError, false);
