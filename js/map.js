@@ -100,7 +100,7 @@ var renderPin = function (data) {
   newPin.addEventListener('click', function () {
     renderCard(data);
   });
-  newPin.addEventListener('keyup', function () {
+  newPin.addEventListener('keyup', function (evt) {
     if (evt.keyCode === ENTER_KEYCODE) {
       window.renderCard(data);
     }
