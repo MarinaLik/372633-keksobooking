@@ -96,8 +96,14 @@ var renderPin = function (data) {
   newPin.className = 'map__pin';
   newPin.style = 'left: ' + (data.location.x + PIN_WIDTH / 2) + 'px; top: ' + (data.location.y + PIN_HEIGHT) + 'px';
   newPin.innerHTML = '<img src="' + data.author.avatar + '" width="40" height="40" draggable="false">';
+  newPin.tabindex = '0';
   newPin.addEventListener('click', function () {
     renderCard(data);
+  });
+  newPin.addEventListener('keyup', function () {
+    if (evt.keyCode === ENTER_KEYCODE) {
+      window.renderCard(data);
+    }
   });
   return newPin;
 };
