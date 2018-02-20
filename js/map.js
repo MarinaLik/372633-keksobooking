@@ -40,12 +40,11 @@
     });
   };
 
-    // границы карты для перемещения метки
-    var borderTop = window.util.getCoords(map).top + 150;
-    var borderBottom = window.util.getCoords(map).top + 500 - MAIN_PIN_HEIGHT/2;
-    var borderLeft = window.util.getCoords(map).left;
-    var borderRight = window.util.getCoords(map).right - MAIN_PIN_WIDTH;
-    console.log(borderTop, borderBottom, borderLeft, borderRight);
+  // границы карты для перемещения метки
+  var borderTop = window.util.getCoords(map).top + 150;
+  var borderBottom = window.util.getCoords(map).top + 500 - MAIN_PIN_HEIGHT / 2;
+  var borderLeft = window.util.getCoords(map).left;
+  var borderRight = window.util.getCoords(map).right - MAIN_PIN_WIDTH;
 
   mainPin.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
@@ -55,33 +54,33 @@
     };
 
     var onMouseMove = function (moveEvt) {
-    moveEvt.preventDefault();
-    var shift = {
-      x: startCoords.x - moveEvt.clientX,
-      y: startCoords.y - moveEvt.clientY
-    };
-    startCoords = {
-      x: moveEvt.clientX,
-      y: moveEvt.clientY
-    };
+      moveEvt.preventDefault();
+      var shift = {
+        x: startCoords.x - moveEvt.clientX,
+        y: startCoords.y - moveEvt.clientY
+      };
+      startCoords = {
+        x: moveEvt.clientX,
+        y: moveEvt.clientY
+      };
 
-    var mainPinY = mainPin.offsetTop - shift.y;
-    var mainPinX = mainPin.offsetLeft - shift.x;
-    if (mainPinY < borderTop) {
-      mainPin.style.top = borderTop + 'px';
-    } else if (mainPinY > borderBottom) {
-      mainPin.style.top = borderBottom + 'px';
-    } else {
-      mainPin.style.top = mainPinY + 'px';
-    }
-    if (mainPinX < borderLeft) {
-      mainPin.style.left = borderLeft + 'px';
-    } else if (mainPinX > borderRight) {
-      mainPin.style.left = borderRight + 'px';
-    } else {
-      mainPin.style.left = mainPinX + 'px';
-    }
-    findAddress();
+      var mainPinY = mainPin.offsetTop - shift.y;
+      var mainPinX = mainPin.offsetLeft - shift.x;
+      if (mainPinY < borderTop) {
+        mainPin.style.top = borderTop + 'px';
+      } else if (mainPinY > borderBottom) {
+        mainPin.style.top = borderBottom + 'px';
+      } else {
+        mainPin.style.top = mainPinY + 'px';
+      }
+      if (mainPinX < borderLeft) {
+        mainPin.style.left = borderLeft + 'px';
+      } else if (mainPinX > borderRight) {
+        mainPin.style.left = borderRight + 'px';
+      } else {
+        mainPin.style.left = mainPinX + 'px';
+      }
+      findAddress();
     };
 
     var onMouseUp = function (upEvt) {
