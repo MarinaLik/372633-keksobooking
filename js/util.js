@@ -23,6 +23,13 @@ window.util = (function () {
       while (elem.lastChild) {
         elem.removeChild(elem.lastChild);
       }
+    },
+    getCoords: function (elem) {
+      var box = elem.getBoundingClientRect();
+      return {
+        top: box.top + pageYOffset,
+        left: box.left + pageXOffset
+      };
     }
   };
 })();
