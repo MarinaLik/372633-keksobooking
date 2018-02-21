@@ -41,8 +41,10 @@
   };
 
   // границы карты для перемещения метки
-  var borderTop = window.util.getCoords(map).top + 150;
-  var borderBottom = window.util.getCoords(map).top + 500 - MAIN_PIN_HEIGHT / 2;
+  var topLine = 150;
+  var bottomLine = 500;
+  var borderTop = window.util.getCoords(map).top + topLine;
+  var borderBottom = window.util.getCoords(map).top + bottomLine - MAIN_PIN_HEIGHT / 2;
   var borderLeft = window.util.getCoords(map).left;
   var borderRight = window.util.getCoords(map).right - MAIN_PIN_WIDTH;
 
@@ -52,6 +54,11 @@
       x: evt.clientX,
       y: evt.clientY
     };
+
+    var mainPinCoords = {
+      x: window.util.getCoords(mainPin).left,
+      y: window.util.getCoords(mainPin).top
+    }
 
     var onMouseMove = function (moveEvt) {
       moveEvt.preventDefault();
@@ -64,22 +71,27 @@
         y: moveEvt.clientY
       };
 
-      var mainPinY = mainPin.offsetTop - shift.y;
-      var mainPinX = mainPin.offsetLeft - shift.x;
+      var mainPinY = mainPinCoords.y - shift.y;
+      var mainPinX = mainPinCoords.x - shift.x;
       if (mainPinY < borderTop) {
-        mainPin.style.top = borderTop + 'px';
+        mainPinY = borderTop;
       } else if (mainPinY > borderBottom) {
-        mainPin.style.top = borderBottom + 'px';
-      } else {
-        mainPin.style.top = mainPinY + 'px';
+        mainPinY = borderBottom;
       }
+      mainPin.style.top = mainPinY + 'px';
+
       if (mainPinX < borderLeft) {
-        mainPin.style.left = borderLeft + 'px';
+        mainPinX = borderLeft;
       } else if (mainPinX > borderRight) {
-        mainPin.style.left = borderRight + 'px';
-      } else {
-        mainPin.style.left = mainPinX + 'px';
+        mainPinX = borderRight;
       }
+      mainPin.style.left = mainPinX + 'px';
+
+      mainPinCoords = {
+      x: mainPinX,
+      y: mainPinY
+    }
+
       findAddress();
     };
 
