@@ -46,7 +46,7 @@
   var borderTop = window.util.getCoords(map).top + topLine;
   var borderBottom = window.util.getCoords(map).top + bottomLine - MAIN_PIN_HEIGHT / 2;
   var borderLeft = window.util.getCoords(map).left;
-  var borderRight = window.util.getCoords(map).right - MAIN_PIN_WIDTH;
+  var borderRight = map.offsetWidth - MAIN_PIN_WIDTH;
 
   mainPin.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
