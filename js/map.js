@@ -58,7 +58,7 @@
     var mainPinCoords = {
       x: window.util.getCoords(mainPin).left,
       y: window.util.getCoords(mainPin).top
-    }
+    };
 
     var onMouseMove = function (moveEvt) {
       moveEvt.preventDefault();
@@ -88,9 +88,9 @@
       mainPin.style.left = mainPinX + 'px';
 
       mainPinCoords = {
-      x: mainPinX,
-      y: mainPinY
-    }
+        x: mainPinX,
+        y: mainPinY
+      };
 
       findAddress();
     };
