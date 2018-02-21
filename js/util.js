@@ -28,8 +28,7 @@ window.util = (function () {
       var box = elem.getBoundingClientRect();
       return {
         top: box.top + pageYOffset,
-        left: box.left + pageXOffset,
-        right: box.right + pageXOffset
+        left: box.left + pageXOffset
       };
     }
   };
