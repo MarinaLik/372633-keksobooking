@@ -53,7 +53,7 @@
     var pElements = descriptionCard.querySelectorAll('p');
     descriptionCard.querySelector('h3').textContent = data.offer.title;
     pElements[0].querySelector('small').textContent = data.offer.adress;
-    descriptionCard.querySelector('.popup__price').textContent = data.offer.price + '&#x20bd;/ночь';
+    descriptionCard.querySelector('.popup__price').textContent = data.offer.price + ' ₽/ночь';
     descriptionCard.querySelector('h4').textContent = data.offer.type.ru;
     pElements[2].textContent = data.offer.rooms + ' комнаты для ' + data.offer.guests + ' гостей';
     pElements[3].textContent = 'Заезд после ' + data.offer.checkin + ', выезд до ' + data.offer.checkout;
