@@ -13,31 +13,44 @@
   });
   var inputAddress = noticeForm.querySelector('#address');
 
+  var mainPinFirstCoords = {
+    x: window.util.getCoords(mainPin).left,
+    y: window.util.getCoords(mainPin).top
+  };
+  console.log(mainPinFirstCoords);
+
   // определение адреса
-  var findAddress = function () {
-    var addressCoordX = Math.floor(window.util.getCoords(mainPin).left + MAIN_PIN_WIDTH / 2);
-    var addressCoordY = Math.floor(window.util.getCoords(mainPin).top + MAIN_PIN_HEIGHT);
+  var findAddress = function (X, Y) {
+    var addressCoordX = Math.floor(X + MAIN_PIN_WIDTH / 2);
+    var addressCoordY = Math.floor(Y + MAIN_PIN_HEIGHT);
     inputAddress.value = addressCoordX + ', ' + addressCoordY;
   };
-  findAddress();
+  findAddress(mainPinFirstCoords.x, mainPinFirstCoords.y);
 
   // отрисовка меток на карте
-  var renderMap = function () {
+  var renderMap = function (offers) {
     var fragment = document.createDocumentFragment();
-    for (var p = 0; p < window.createOffers.length; p++) {
-      fragment.appendChild(window.renderPin(window.createOffers[p]));
+    for (var p = 0; p < offers.length; p++) {
+      fragment.appendChild(window.renderPin(offers[p]));
     }
     return fragment;
   };
 
   // активация страницы
-  var activePage = function () {
+  var onPageActive = function (offers) {
     map.classList.remove('map--faded');
-    mapPins.appendChild(renderMap());
+    mapPins.appendChild(renderMap(offers));
     noticeForm.classList.remove('notice__form--disabled');
     noticeFieldsets.forEach(function (item) {
       item.removeAttribute('disabled');
     });
+  };
+
+  var onErrorShow = function (errorMessage) {
+    var elemError = document.createElement('div');
+    elemError.classList.add('error');
+    elemError.textContent = errorMessage;
+    document.body.insertAdjacentElement('afterbegin', elemError);
   };
 
   // границы карты для перемещения метки
@@ -92,13 +105,13 @@
         y: mainPinY
       };
 
-      findAddress();
+      findAddress(mainPinCoords.x, mainPinCoords.y);
     };
 
     var onMouseUp = function (upEvt) {
       upEvt.preventDefault();
       if (map.classList.contains('map--faded')) {
-        activePage();
+        window.load(onPageActive, onErrorShow);
       }
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUp);
@@ -111,8 +124,44 @@
   mainPin.addEventListener('mouseup', function (evt) {
     evt.preventDefault();
     if (map.classList.contains('map--faded')) {
-      activePage();
+      window.load(onPageActive, onErrorShow);
     }
-    findAddress();
+    findAddress(window.util.getCoords(mainPin).left, window.util.getCoords(mainPin).top);
   });
+
+  var deactivatePage = function () {
+    noticeForm.reset();
+    var pins = mapPins.querySelectorAll('.map__pin');
+    for (var i = pins.length - 1; i > 0; i--) {
+      var child = pins[i];
+      child.parentElement.removeChild(child);
+    }
+    if (map.querySelector('.popup')) {
+      var popup = map.querySelector('.popup');
+      map.removeChild(popup);
+    }
+    map.classList.add('map--faded');
+    noticeForm.classList.add('notice__form--disabled');
+    mainPin.style.left = mainPinFirstCoords.x + 'px';
+    mainPin.style.top = mainPinFirstCoords.y + MAIN_PIN_HEIGHT / 2 + 'px';
+    findAddress(mainPinFirstCoords.x, mainPinFirstCoords.y);
+  };
+
+  var btnReset = noticeForm.querySelector('.form__reset');
+
+  var onResetPress = function (evt) {
+    evt.preventDefault();
+    deactivatePage();
+  };
+  btnReset.addEventListener('click', onResetPress);
+
+  var onFormSend = function (response) {
+      deactivatePage();
+    };
+
+  noticeForm.addEventListener('submit', function (evt) {
+    window.upload(new FormData(noticeForm), onFormSend, onErrorShow);
+    evt.preventDefault();
+  });
+
 })();
