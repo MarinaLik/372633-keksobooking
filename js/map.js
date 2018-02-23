@@ -17,7 +17,6 @@
     x: window.util.getCoords(mainPin).left,
     y: window.util.getCoords(mainPin).top
   };
-  console.log(mainPinFirstCoords);
 
   // определение адреса
   var findAddress = function (X, Y) {
@@ -155,9 +154,9 @@
   };
   btnReset.addEventListener('click', onResetPress);
 
-  var onFormSend = function (response) {
-      deactivatePage();
-    };
+  var onFormSend = function () {
+    deactivatePage();
+  };
 
   noticeForm.addEventListener('submit', function (evt) {
     window.upload(new FormData(noticeForm), onFormSend, onErrorShow);
