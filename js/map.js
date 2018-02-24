@@ -50,6 +50,9 @@
     elemError.classList.add('error');
     elemError.textContent = errorMessage;
     document.body.insertAdjacentElement('afterbegin', elemError);
+    setTimeout(function() {
+      document.body.removeChild(elemError);
+    }, 3000);
   };
 
   // границы карты для перемещения метки
@@ -128,6 +131,7 @@
     findAddress(window.util.getCoords(mainPin).left, window.util.getCoords(mainPin).top);
   });
 
+  // возврат страницы в неактивное состояние
   var deactivatePage = function () {
     noticeForm.reset();
     var pins = mapPins.querySelectorAll('.map__pin');
@@ -141,9 +145,9 @@
     }
     map.classList.add('map--faded');
     noticeForm.classList.add('notice__form--disabled');
-    mainPin.style.left = mainPinFirstCoords.x + 'px';
+    mainPin.style.left = map.offsetWidth / 2 + 'px';
     mainPin.style.top = mainPinFirstCoords.y + MAIN_PIN_HEIGHT / 2 + 'px';
-    findAddress(mainPinFirstCoords.x, mainPinFirstCoords.y);
+    findAddress(window.util.getCoords(mainPin).left, window.util.getCoords(mainPin).top);
   };
 
   var btnReset = noticeForm.querySelector('.form__reset');
