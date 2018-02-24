@@ -50,7 +50,7 @@
     elemError.classList.add('error');
     elemError.textContent = errorMessage;
     document.body.insertAdjacentElement('afterbegin', elemError);
-    setTimeout(function() {
+    setTimeout(function () {
       document.body.removeChild(elemError);
     }, 3000);
   };
