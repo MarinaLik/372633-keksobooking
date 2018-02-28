@@ -30,21 +30,17 @@
   var ESC_KEYCODE = 27;
   var ENTER_KEYCODE = 13;
 
-  var closeCard = function () {
-    var popup = map.querySelector('.popup');
-    map.removeChild(popup);
-  };
   var onPopupCloseClick = function () {
-    closeCard();
+    window.util.closePopup(map);
   };
   var onPopupClosePressEnt = function (evt) {
     if (evt.keyCode === ENTER_KEYCODE && evt.target === document.activeElement) {
-      closeCard();
+      window.util.closePopup(map);
     }
   };
   var onPopupClosePressEsc = function (evt) {
     if (evt.keyCode === ESC_KEYCODE) {
-      closeCard();
+      window.util.closePopup(map);
     }
   };
 
@@ -70,9 +66,8 @@
     popupClose.addEventListener('click', onPopupCloseClick);
     popupClose.addEventListener('keyup', onPopupClosePressEnt);
     document.addEventListener('keyup', onPopupClosePressEsc);
-    if (map.querySelector('.popup')) {
-      closeCard();
-    }
+    window.util.closePopup(map);
+
     map.insertBefore(descriptionCard, filtersContainer);
   };
 })();
