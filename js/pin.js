@@ -5,8 +5,9 @@
   var PIN_WIDTH = 50;
   var PIN_HEIGHT = 70;
   var ENTER_KEYCODE = 13;
+  var COUNT_PINS = 5;
 
-  window.renderPin = function (data) {
+  var renderPin = function (data) {
     var newPin = document.createElement('button');
     newPin.className = 'map__pin';
     newPin.style = 'left: ' + (data.location.x + PIN_WIDTH / 2) + 'px; top: ' + (data.location.y + PIN_HEIGHT) + 'px';
@@ -21,5 +22,14 @@
       }
     });
     return newPin;
+  };
+
+  window.addPins = function (data) {
+    var takeCount = data.length > COUNT_PINS ? COUNT_PINS : data.length;
+    var fragment = document.createDocumentFragment();
+    for (var p = 0; p < takeCount; p++) {
+      fragment.appendChild(renderPin(data[p]));
+    }
+    return fragment;
   };
 })();
