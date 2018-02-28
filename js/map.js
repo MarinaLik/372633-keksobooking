@@ -3,6 +3,7 @@
 (function () {
   var MAIN_PIN_WIDTH = 65;
   var MAIN_PIN_HEIGHT = 65;
+  var TIME_ERROR_SHOW = 3000;
   var map = document.querySelector('.map');
   var mapPins = document.querySelector('.map__pins');
   var mainPin = mapPins.querySelector('.map__pin--main');
@@ -12,6 +13,7 @@
     item.setAttribute('disabled', '');
   });
   var inputAddress = noticeForm.querySelector('#address');
+  var filtersForm = map.querySelector('.map__filters');
 
   var mainPinFirstCoords = {
     x: window.util.getCoords(mainPin).left,
@@ -26,23 +28,25 @@
   };
   findAddress(mainPinFirstCoords.x, mainPinFirstCoords.y);
 
-  // отрисовка меток на карте
-  var renderMap = function (offers) {
-    var fragment = document.createDocumentFragment();
-    for (var p = 0; p < offers.length; p++) {
-      fragment.appendChild(window.renderPin(offers[p]));
-    }
-    return fragment;
-  };
-
   // активация страницы
-  var onPageActive = function (offers) {
+  var pageActive = function () {
     map.classList.remove('map--faded');
-    mapPins.appendChild(renderMap(offers));
     noticeForm.classList.remove('notice__form--disabled');
     noticeFieldsets.forEach(function (item) {
       item.removeAttribute('disabled');
     });
+  };
+
+  // отрисовка меток на карте
+  var similarOffers = [];
+
+  var renderMap = function (data) {
+    mapPins.appendChild(window.addPins(data));
+  };
+
+  var onMapRender = function (data) {
+    similarOffers = data;
+    renderMap(similarOffers);
   };
 
   var onErrorShow = function (errorMessage) {
@@ -52,7 +56,7 @@
     document.body.insertAdjacentElement('afterbegin', elemError);
     setTimeout(function () {
       document.body.removeChild(elemError);
-    }, 3000);
+    }, TIME_ERROR_SHOW);
   };
 
   // границы карты для перемещения метки
@@ -63,6 +67,7 @@
   var borderLeft = window.util.getCoords(map).left;
   var borderRight = map.offsetWidth - MAIN_PIN_WIDTH;
 
+  // перемещение метки с активацией страницы и отрисовкой меток
   mainPin.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
     var startCoords = {
@@ -113,7 +118,8 @@
     var onMouseUp = function (upEvt) {
       upEvt.preventDefault();
       if (map.classList.contains('map--faded')) {
-        window.load(onPageActive, onErrorShow);
+        pageActive();
+        window.load(onMapRender, onErrorShow);
       }
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUp);
@@ -126,23 +132,33 @@
   mainPin.addEventListener('mouseup', function (evt) {
     evt.preventDefault();
     if (map.classList.contains('map--faded')) {
-      window.load(onPageActive, onErrorShow);
+      pageActive();
+      window.load(onMapRender, onErrorShow);
     }
     findAddress(window.util.getCoords(mainPin).left, window.util.getCoords(mainPin).top);
   });
 
-  // возврат страницы в неактивное состояние
-  var deactivatePage = function () {
-    noticeForm.reset();
+  var removePins = function () {
     var pins = mapPins.querySelectorAll('.map__pin');
     for (var i = pins.length - 1; i > 0; i--) {
       var child = pins[i];
       child.parentElement.removeChild(child);
     }
-    if (map.querySelector('.popup')) {
-      var popup = map.querySelector('.popup');
-      map.removeChild(popup);
-    }
+  };
+
+  // фильтрация похожих объявлений
+  filtersForm.addEventListener('change', function () {
+    window.util.closePopup(map);
+    removePins();
+    var selectedOffers = window.updatePins(similarOffers);
+    window.util.debounce(renderMap(selectedOffers));
+  });
+
+  // возврат страницы в неактивное состояние
+  var deactivatePage = function () {
+    noticeForm.reset();
+    removePins();
+    window.util.closePopup(map);
     map.classList.add('map--faded');
     noticeForm.classList.add('notice__form--disabled');
     mainPin.style.left = map.offsetWidth / 2 + 'px';
@@ -166,5 +182,4 @@
     window.upload(new FormData(noticeForm), onFormSend, onErrorShow);
     evt.preventDefault();
   });
-
 })();
