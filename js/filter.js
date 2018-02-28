@@ -66,16 +66,6 @@
         filteredOffers = filterByFeatures(item);
       });
     }
-    // if (filteredOffers.length) {
-    //   return filteredOffers;
-    // }
-    console.log(filteredOffers);
     return filteredOffers;
-
-    // window.selectedOffers = filteredOffers;
-
-    // if (filteredOffers.length) {
-    //   window.addPins(filteredOffers);
-    // }
   };
 })();
