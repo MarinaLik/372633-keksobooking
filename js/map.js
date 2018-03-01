@@ -21,21 +21,12 @@
   };
 
   // определение адреса
-  var findAddress = function (X, Y) {
-    var addressCoordX = Math.floor(X + MAIN_PIN_WIDTH / 2);
-    var addressCoordY = Math.floor(Y + MAIN_PIN_HEIGHT);
+  var findAddress = function (x, y) {
+    var addressCoordX = Math.floor(x + MAIN_PIN_WIDTH / 2);
+    var addressCoordY = Math.floor(y + MAIN_PIN_HEIGHT);
     inputAddress.value = addressCoordX + ', ' + addressCoordY;
   };
   findAddress(mainPinFirstCoords.x, mainPinFirstCoords.y);
-
-  // активация страницы
-  var pageActive = function () {
-    map.classList.remove('map--faded');
-    noticeForm.classList.remove('notice__form--disabled');
-    noticeFieldsets.forEach(function (item) {
-      item.removeAttribute('disabled');
-    });
-  };
 
   // отрисовка меток на карте
   var similarOffers = [];
@@ -59,11 +50,23 @@
     }, TIME_ERROR_SHOW);
   };
 
+  // активация страницы
+  var activePage = function () {
+    if (map.classList.contains('map--faded')) {
+      map.classList.remove('map--faded');
+      noticeForm.classList.remove('notice__form--disabled');
+      noticeFieldsets.forEach(function (item) {
+        item.removeAttribute('disabled');
+      });
+      window.backend.load(onMapRender, onErrorShow);
+    }
+  };
+
   // границы карты для перемещения метки
   var topLine = 150;
   var bottomLine = 500;
   var borderTop = window.util.getCoords(map).top + topLine;
-  var borderBottom = window.util.getCoords(map).top + bottomLine - MAIN_PIN_HEIGHT / 2;
+  var borderBottom = window.util.getCoords(map).top + bottomLine - MAIN_PIN_HEIGHT;
   var borderLeft = window.util.getCoords(map).left;
   var borderRight = map.offsetWidth - MAIN_PIN_WIDTH;
 
@@ -117,10 +120,7 @@
 
     var onMouseUp = function (upEvt) {
       upEvt.preventDefault();
-      if (map.classList.contains('map--faded')) {
-        pageActive();
-        window.load(onMapRender, onErrorShow);
-      }
+      activePage();
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUp);
     };
@@ -131,13 +131,11 @@
 
   mainPin.addEventListener('mouseup', function (evt) {
     evt.preventDefault();
-    if (map.classList.contains('map--faded')) {
-      pageActive();
-      window.load(onMapRender, onErrorShow);
-    }
+    activePage();
     findAddress(window.util.getCoords(mainPin).left, window.util.getCoords(mainPin).top);
   });
 
+  // удаление меток
   var removePins = function () {
     var pins = mapPins.querySelectorAll('.map__pin');
     for (var i = pins.length - 1; i > 0; i--) {
@@ -150,8 +148,7 @@
   filtersForm.addEventListener('change', function () {
     window.util.closePopup(map);
     removePins();
-    var selectedOffers = window.updatePins(similarOffers);
-    window.util.debounce(renderMap(selectedOffers));
+    window.util.debounce(renderMap(window.updatePins(similarOffers)));
   });
 
   // возврат страницы в неактивное состояние
@@ -179,7 +176,7 @@
   };
 
   noticeForm.addEventListener('submit', function (evt) {
-    window.upload(new FormData(noticeForm), onFormSend, onErrorShow);
+    window.backend.upload(new FormData(noticeForm), onFormSend, onErrorShow);
     evt.preventDefault();
   });
 })();

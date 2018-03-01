@@ -12,7 +12,7 @@
     newPin.className = 'map__pin';
     newPin.style = 'left: ' + (data.location.x + PIN_WIDTH / 2) + 'px; top: ' + (data.location.y + PIN_HEIGHT) + 'px';
     newPin.innerHTML = '<img src="' + data.author.avatar + '" width="40" height="40" draggable="false">';
-    newPin.tabindex = '0';
+
     newPin.addEventListener('click', function () {
       window.renderCard(data);
     });
@@ -27,8 +27,8 @@
   window.addPins = function (data) {
     var takeCount = data.length > COUNT_PINS ? COUNT_PINS : data.length;
     var fragment = document.createDocumentFragment();
-    for (var p = 0; p < takeCount; p++) {
-      fragment.appendChild(renderPin(data[p]));
+    for (var i = 0; i < takeCount; i++) {
+      fragment.appendChild(renderPin(data[i]));
     }
     return fragment;
   };

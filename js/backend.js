@@ -23,17 +23,18 @@
     xhr.timeout = TIMEOUT;
   };
 
-  window.load = function (onLoad, onError) {
-    var xhr = new XMLHttpRequest();
-    xhrTest(xhr, onLoad, onError);
-    xhr.open('GET', 'https://js.dump.academy/keksobooking/data', true);
-    xhr.send();
-  };
-
-  window.upload = function (data, onLoad, onError) {
-    var xhr = new XMLHttpRequest();
-    xhrTest(xhr, onLoad, onError);
-    xhr.open('POST', 'https://js.dump.academy/keksobooking');
-    xhr.send(data);
+  window.backend = {
+    load: function (onLoad, onError) {
+      var xhr = new XMLHttpRequest();
+      xhrTest(xhr, onLoad, onError);
+      xhr.open('GET', 'https://js.dump.academy/keksobooking/data', true);
+      xhr.send();
+    },
+    upload: function (data, onLoad, onError) {
+      var xhr = new XMLHttpRequest();
+      xhrTest(xhr, onLoad, onError);
+      xhr.open('POST', 'https://js.dump.academy/keksobooking');
+      xhr.send(data);
+    }
   };
 })();

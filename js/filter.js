@@ -1,7 +1,7 @@
 'use strict';
 
 (function () {
-  var PRICES_TO_COMPARE = {
+  var PRICES_LIMIT = {
     low: 10000,
     high: 50000
   };
@@ -10,25 +10,23 @@
 
   window.updatePins = function (offers) {
     var filteredOffers = offers.slice();
-
     var selectorFilters = filtersForm.querySelectorAll('select');
     var featuresFilters = filtersForm.querySelectorAll('input[type=checkbox]:checked');
 
     var FilterRules = {
       'housing-type': 'type',
-      'housing-rooms': 'room',
+      'housing-rooms': 'rooms',
       'housing-guests': 'guests'
     };
 
     var getPrice = function (item) {
       var num = item.offer.price;
-      if (num < PRICES_TO_COMPARE.low) {
+      if (num < PRICES_LIMIT.low) {
         return 'low';
-      } else if (num >= PRICES_TO_COMPARE.low && num < PRICES_TO_COMPARE.high) {
+      } else if (num >= PRICES_LIMIT.low && num < PRICES_LIMIT.high) {
         return 'middle';
-      } else {
-        return 'high';
       }
+      return 'high';
     };
 
     var filterByValue = function (elem, property) {
@@ -52,11 +50,7 @@
     if (selectorFilters.length !== null) {
       [].forEach.call(selectorFilters, function (item) {
         if (item.value !== 'any') {
-          if (item.id !== 'housing-price') {
-            filteredOffers = filterByValue(item, FilterRules[item.id]);
-          } else {
-            filteredOffers = filterByPrice(item);
-          }
+          filteredOffers = (item.id !== 'housing-price') ? filterByValue(item, FilterRules[item.id]) : filterByPrice(item);
         }
       });
     }

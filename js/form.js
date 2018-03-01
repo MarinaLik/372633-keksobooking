@@ -49,15 +49,15 @@
     '3': ['1', '2', '3'],
     '100': ['0']
   };
-
+  var capacityOptions = capacity.querySelectorAll('option');
   var capacityDisabled = function () {
-    var capacityOptions = capacity.querySelectorAll('option');
     for (var i = 0; i < capacityOptions.length; i++) {
       if (capacityOptions[i].hasAttribute('disabled')) {
         capacityOptions[i].removeAttribute('disabled');
       }
       capacityOptions[i].disabled = (capasityInRoom[room.value].indexOf(capacityOptions[i].value) === -1) ? true : false;
-    } return capacityOptions;
+    }
+    return capacityOptions;
   };
   capacityDisabled();
 
