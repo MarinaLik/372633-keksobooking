@@ -41,6 +41,7 @@
   var onPopupClosePressEsc = function (evt) {
     if (evt.keyCode === ESC_KEYCODE) {
       window.util.closePopup(map);
+      document.removeEventListener('keyup', onPopupClosePressEsc);
     }
   };
 
