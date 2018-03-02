@@ -3,6 +3,7 @@
 (function () {
   var MAIN_PIN_WIDTH = 65;
   var MAIN_PIN_HEIGHT = 65;
+  var TIME_ERROR_SHOW = 3000;
   var map = document.querySelector('.map');
   var mapPins = document.querySelector('.map__pins');
   var mainPin = mapPins.querySelector('.map__pin--main');
@@ -12,6 +13,7 @@
     item.setAttribute('disabled', '');
   });
   var inputAddress = noticeForm.querySelector('#address');
+  var filtersForm = map.querySelector('.map__filters');
 
   var mainPinFirstCoords = {
     x: window.util.getCoords(mainPin).left,
@@ -19,30 +21,23 @@
   };
 
   // определение адреса
-  var findAddress = function (X, Y) {
-    var addressCoordX = Math.floor(X + MAIN_PIN_WIDTH / 2);
-    var addressCoordY = Math.floor(Y + MAIN_PIN_HEIGHT);
+  var findAddress = function (x, y) {
+    var addressCoordX = Math.floor(x + MAIN_PIN_WIDTH / 2);
+    var addressCoordY = Math.floor(y + MAIN_PIN_HEIGHT);
     inputAddress.value = addressCoordX + ', ' + addressCoordY;
   };
   findAddress(mainPinFirstCoords.x, mainPinFirstCoords.y);
 
   // отрисовка меток на карте
-  var renderMap = function (offers) {
-    var fragment = document.createDocumentFragment();
-    for (var p = 0; p < offers.length; p++) {
-      fragment.appendChild(window.renderPin(offers[p]));
-    }
-    return fragment;
+  var similarOffers = [];
+
+  var renderMap = function (data) {
+    mapPins.appendChild(window.addPins(data));
   };
 
-  // активация страницы
-  var onPageActive = function (offers) {
-    map.classList.remove('map--faded');
-    mapPins.appendChild(renderMap(offers));
-    noticeForm.classList.remove('notice__form--disabled');
-    noticeFieldsets.forEach(function (item) {
-      item.removeAttribute('disabled');
-    });
+  var onMapRender = function (data) {
+    similarOffers = data;
+    renderMap(similarOffers);
   };
 
   var onErrorShow = function (errorMessage) {
@@ -52,17 +47,30 @@
     document.body.insertAdjacentElement('afterbegin', elemError);
     setTimeout(function () {
       document.body.removeChild(elemError);
-    }, 3000);
+    }, TIME_ERROR_SHOW);
+  };
+
+  // активация страницы
+  var activePage = function () {
+    if (map.classList.contains('map--faded')) {
+      map.classList.remove('map--faded');
+      noticeForm.classList.remove('notice__form--disabled');
+      noticeFieldsets.forEach(function (item) {
+        item.removeAttribute('disabled');
+      });
+      window.backend.load(onMapRender, onErrorShow);
+    }
   };
 
   // границы карты для перемещения метки
   var topLine = 150;
   var bottomLine = 500;
   var borderTop = window.util.getCoords(map).top + topLine;
-  var borderBottom = window.util.getCoords(map).top + bottomLine - MAIN_PIN_HEIGHT / 2;
+  var borderBottom = window.util.getCoords(map).top + bottomLine - MAIN_PIN_HEIGHT;
   var borderLeft = window.util.getCoords(map).left;
   var borderRight = map.offsetWidth - MAIN_PIN_WIDTH;
 
+  // перемещение метки с активацией страницы и отрисовкой меток
   mainPin.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
     var startCoords = {
@@ -112,9 +120,7 @@
 
     var onMouseUp = function (upEvt) {
       upEvt.preventDefault();
-      if (map.classList.contains('map--faded')) {
-        window.load(onPageActive, onErrorShow);
-      }
+      activePage();
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUp);
     };
@@ -125,24 +131,31 @@
 
   mainPin.addEventListener('mouseup', function (evt) {
     evt.preventDefault();
-    if (map.classList.contains('map--faded')) {
-      window.load(onPageActive, onErrorShow);
-    }
+    activePage();
     findAddress(window.util.getCoords(mainPin).left, window.util.getCoords(mainPin).top);
   });
 
-  // возврат страницы в неактивное состояние
-  var deactivatePage = function () {
-    noticeForm.reset();
+  // удаление меток
+  var removePins = function () {
     var pins = mapPins.querySelectorAll('.map__pin');
     for (var i = pins.length - 1; i > 0; i--) {
       var child = pins[i];
       child.parentElement.removeChild(child);
     }
-    if (map.querySelector('.popup')) {
-      var popup = map.querySelector('.popup');
-      map.removeChild(popup);
-    }
+  };
+
+  // фильтрация похожих объявлений
+  filtersForm.addEventListener('change', function () {
+    window.util.closePopup(map);
+    removePins();
+    window.util.debounce(renderMap(window.updatePins(similarOffers)));
+  });
+
+  // возврат страницы в неактивное состояние
+  var deactivatePage = function () {
+    noticeForm.reset();
+    removePins();
+    window.util.closePopup(map);
     map.classList.add('map--faded');
     noticeForm.classList.add('notice__form--disabled');
     mainPin.style.left = map.offsetWidth / 2 + 'px';
@@ -163,8 +176,7 @@
   };
 
   noticeForm.addEventListener('submit', function (evt) {
-    window.upload(new FormData(noticeForm), onFormSend, onErrorShow);
+    window.backend.upload(new FormData(noticeForm), onFormSend, onErrorShow);
     evt.preventDefault();
   });
-
 })();

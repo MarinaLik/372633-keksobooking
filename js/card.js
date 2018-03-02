@@ -1,22 +1,25 @@
 'use strict';
 // создание карточки объявления
 (function () {
+  var ESC_KEYCODE = 27;
+  var ENTER_KEYCODE = 13;
   var map = document.querySelector('.map');
   var template = document.querySelector('template').content;
   var mapCard = template.querySelector('.map__card');
   var filtersContainer = document.querySelector('.map__filters-container');
-  // список услуг сгенерированного объявления для замены в шаблоне карточки
-  var servicesList = function (data) {
+
+  // список услуг для замены в шаблоне карточки
+  var changeServices = function (data) {
     var services = document.createDocumentFragment();
-    for (var j = 0; j < data.length; j++) {
+    for (var i = 0; i < data.length; i++) {
       var service = document.createElement('li');
-      service.className = 'feature feature--' + data[j];
+      service.className = 'feature feature--' + data[i];
       services.appendChild(service);
     }
     return services;
   };
   // список фотографий для замены в шаблоне карточки
-  var imgList = function (data) {
+  var changeImg = function (data) {
     var images = document.createDocumentFragment();
     for (var j = 0; j < data.length; j++) {
       var image = document.createElement('li');
@@ -27,24 +30,18 @@
   };
 
   // закрытие карточки
-  var ESC_KEYCODE = 27;
-  var ENTER_KEYCODE = 13;
-
-  var closeCard = function () {
-    var popup = map.querySelector('.popup');
-    map.removeChild(popup);
-  };
   var onPopupCloseClick = function () {
-    closeCard();
+    window.util.closePopup(map);
   };
   var onPopupClosePressEnt = function (evt) {
     if (evt.keyCode === ENTER_KEYCODE && evt.target === document.activeElement) {
-      closeCard();
+      window.util.closePopup(map);
     }
   };
   var onPopupClosePressEsc = function (evt) {
     if (evt.keyCode === ESC_KEYCODE) {
-      closeCard();
+      window.util.closePopup(map);
+      document.removeEventListener('keyup', onPopupClosePressEsc);
     }
   };
 
@@ -59,20 +56,19 @@
     pElements[3].textContent = 'Заезд после ' + data.offer.checkin + ', выезд до ' + data.offer.checkout;
     var featuresList = descriptionCard.querySelector('.popup__features');
     window.util.removeChildren(featuresList);
-    featuresList.appendChild(servicesList(data.offer.features));
+    featuresList.appendChild(changeServices(data.offer.features));
     pElements[4].textContent = data.offer.description;
     var picturesList = descriptionCard.querySelector('.popup__pictures');
     window.util.removeChildren(picturesList);
-    picturesList.appendChild(imgList(data.offer.photos));
+    picturesList.appendChild(changeImg(data.offer.photos));
     descriptionCard.querySelector('.popup__avatar').setAttribute('src', data.author.avatar);
 
     var popupClose = descriptionCard.querySelector('.popup__close');
     popupClose.addEventListener('click', onPopupCloseClick);
     popupClose.addEventListener('keyup', onPopupClosePressEnt);
     document.addEventListener('keyup', onPopupClosePressEsc);
-    if (map.querySelector('.popup')) {
-      closeCard();
-    }
+    window.util.closePopup(map);
+
     map.insertBefore(descriptionCard, filtersContainer);
   };
 })();
