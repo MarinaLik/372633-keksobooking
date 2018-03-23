@@ -735,7 +735,22 @@ textarea:focus
 
 .form__photo-container
 {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+
+.form__photo-container .upload
+{
     width: 140px;
+}
+
+.form__photo {
+    width: 140px;
+    height: auto;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    cursor: move;
 }
 
 .form__element--submit
